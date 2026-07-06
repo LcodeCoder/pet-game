@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+    <meta name="theme-color" content="#07121c" />
+    <title>&#32466;&#32466;&#20048;&#22253;</title>
+    <link rel="stylesheet" href="./src/styles.css" />
+  </head>
+  <body>
+    <main id="app" class="game-shell">
+      <canvas id="gameCanvas" aria-label="Rongrong Paradise game canvas"></canvas>
+
+      <section id="hud" class="hud" aria-live="polite">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">&#128062;</span>
+          <div>
+            <strong>&#32466;&#32466;&#20048;&#22253;</strong>
+            <span id="modeName">Loading...</span>
+          </div>
+        </div>
+        <div class="stats">
+          <span>Score <b id="score">0</b></span>
+          <span>Hits <b id="hits">0</b></span>
+          <span>Combo <b id="combo">0</b></span>
+          <span>FPS <b id="fps">--</b></span>
+        </div>
+        <div class="actions">
+          <button id="nextModeButton" type="button">Next</button>
+          <button id="settingsButton" type="button">Settings</button>
+        </div>
+      </section>
+
+      <section id="startOverlay" class="overlay visible">
+        <div class="card hero-card">
+          <p class="eyebrow">Cat-first mini game</p>
+          <h1>&#32466;&#32466;&#20048;&#22253;</h1>
+          <p>High-contrast moving targets, soft feedback sounds, and anti-repeat mode rotation for curious cats.</p>
+          <button id="startButton" type="button" class="primary">Start Playing</button>
+          <p class="hint">Tip: use a landscape phone/tablet. Touch or click the moving target.</p>
+        </div>
+      </section>
+
+      <section id="settingsPanel" class="panel" aria-hidden="true">
+        <div class="panel-header">
+          <h2>Settings</h2>
+          <button id="closeSettingsButton" type="button" aria-label="Close settings">&times;</button>
+        </div>
+        <label>Speed
+          <select id="speedLevel">
+            <option value="1">Slow</option>
+            <option value="2">Medium</option>
+            <option value="3">Fast</option>
+          </select>
+        </label>
+        <label>Target size
+          <select id="targetSize">
+            <option value="small">Small</option>
+            <option value="medium">Medium</option>
+            <option value="large">Large</option>
+          </select>
+        </label>
+        <label>Stimulation
+          <select id="stimulation">
+            <option value="calm">Calm</option>
+            <option value="standard">Standard</option>
+            <option value="active">Active</option>
+          </select>
+        </label>
+        <label>Sound
+          <select id="soundLevel">
+            <option value="off">Off</option>
+            <option value="soft">Soft</option>
+            <option value="standard">Standard</option>
+            <option value="active">Active</option>
+          </select>
+        </label>
+        <label>Rotation
+          <select id="rotationStrategy">
+            <option value="auto">Auto recommendation</option>
+            <option value="calmOnly">Calm only</option>
+            <option value="highStimShort">High stimulation short rounds</option>
+            <option value="mixed">Mixed random</option>
+          </select>
+        </label>
+        <label class="check-row">
+          <input id="muted" type="checkbox" /> Muted
+        </label>
+        <div class="panel-actions">
+          <button id="resetButton" type="button">Reset</button>
+          <button id="saveSettingsButton" type="button" class="primary">Save</button>
+        </div>
+      </section>
+
+      <section id="restPrompt" class="rest-prompt" aria-hidden="true">
+        <strong>Rest suggestion</strong>
+        <span>Switching toward calmer motion. Give your cat a short break if they look tired.</span>
+        <button id="dismissRestButton" type="button">OK</button>
+      </section>
+    </main>
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>

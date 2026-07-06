@@ -1,0 +1,13 @@
+node_modules/
+dist/
+.DS_Store
+*.log
+.env
+.env.*
+# Local AI/Trellis workspace files are intentionally not committed for this repo.
+.agents/
+.claude/
+.codex/
+.trellis/
+AGENTS.md
+task

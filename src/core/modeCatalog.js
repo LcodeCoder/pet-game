@@ -1,0 +1,123 @@
+export const STIMULATION = Object.freeze({
+  LOW: 'low',
+  MEDIUM: 'medium',
+  HIGH: 'high',
+  SMART: 'smart',
+});
+
+export const MODE_CATALOG = Object.freeze([
+  {
+    id: 1,
+    name: 'Laser Dot',
+    category: 'laser',
+    targetKind: 'dot',
+    stimulation: STIMULATION.HIGH,
+    defaultUnlocked: true,
+    palette: ['#ff2a2a', '#ffef7a', '#ff8a80'],
+    background: ['#08111d', '#141022'],
+    targetCount: 2,
+    movement: { pathKind: 'dart', baseSpeed: 330, turnEveryMs: 620, pauseChance: 0.1, vanishChance: 0.04 },
+    sound: { frequency: 640, type: 'sine' },
+  },
+  {
+    id: 2,
+    name: 'Tiny Bug Chase',
+    category: 'insect',
+    targetKind: 'bug',
+    stimulation: STIMULATION.MEDIUM,
+    defaultUnlocked: true,
+    palette: ['#f6d365', '#222222', '#fffb91'],
+    background: ['#091713', '#16221c'],
+    targetCount: 3,
+    movement: { pathKind: 'crawl', baseSpeed: 130, turnEveryMs: 980, pauseChance: 0.18, vanishChance: 0.02 },
+    sound: { frequency: 420, type: 'triangle' },
+  },
+  {
+    id: 3,
+    name: 'Pond Fish',
+    category: 'aquatic',
+    targetKind: 'fish',
+    stimulation: STIMULATION.MEDIUM,
+    defaultUnlocked: true,
+    palette: ['#72e3ff', '#3aa7ff', '#ffffff'],
+    background: ['#071522', '#09283a'],
+    targetCount: 4,
+    movement: { pathKind: 'float', baseSpeed: 115, turnEveryMs: 1300, pauseChance: 0.08, vanishChance: 0.01 },
+    sound: { frequency: 300, type: 'sine' },
+  },
+  {
+    id: 4,
+    name: 'Feather Drift',
+    category: 'feather',
+    targetKind: 'feather',
+    stimulation: STIMULATION.LOW,
+    defaultUnlocked: true,
+    palette: ['#fefefe', '#ffe6a7', '#ff7ab6'],
+    background: ['#12131b', '#201827'],
+    targetCount: 2,
+    movement: { pathKind: 'sway', baseSpeed: 85, turnEveryMs: 1600, pauseChance: 0.24, vanishChance: 0.01 },
+    sound: { frequency: 260, type: 'sine' },
+  },
+  {
+    id: 5,
+    name: 'Mouse Holes',
+    category: 'hideSeek',
+    targetKind: 'mouse',
+    stimulation: STIMULATION.MEDIUM,
+    defaultUnlocked: true,
+    palette: ['#d7b899', '#111111', '#ffdf6e'],
+    background: ['#10100e', '#201811'],
+    targetCount: 3,
+    movement: { pathKind: 'peek', baseSpeed: 95, turnEveryMs: 900, pauseChance: 0.35, vanishChance: 0.08 },
+    sound: { frequency: 500, type: 'square' },
+  },
+  {
+    id: 6,
+    name: 'Edge Feather Sweep',
+    category: 'feather',
+    targetKind: 'feather',
+    stimulation: STIMULATION.HIGH,
+    defaultUnlocked: true,
+    palette: ['#fff7ae', '#ff4545', '#111111'],
+    background: ['#08090e', '#15151c'],
+    targetCount: 1,
+    movement: { pathKind: 'edgeRun', baseSpeed: 270, turnEveryMs: 720, pauseChance: 0.08, vanishChance: 0.03 },
+    sound: { frequency: 720, type: 'triangle' },
+  },
+  {
+    id: 7,
+    name: 'Roach Escape',
+    category: 'insect',
+    targetKind: 'bug',
+    stimulation: STIMULATION.HIGH,
+    defaultUnlocked: true,
+    palette: ['#1b0f09', '#ffde59', '#050505'],
+    background: ['#080604', '#17120c'],
+    targetCount: 2,
+    movement: { pathKind: 'edgeRun', baseSpeed: 300, turnEveryMs: 560, pauseChance: 0.06, vanishChance: 0.03 },
+    sound: { frequency: 560, type: 'sawtooth' },
+  },
+  {
+    id: 8,
+    name: 'Window Shadows',
+    category: 'shadow',
+    targetKind: 'shadow',
+    stimulation: STIMULATION.LOW,
+    defaultUnlocked: true,
+    palette: ['#020202', '#2a3342', '#b8d8ff'],
+    background: ['#111824', '#202a34'],
+    targetCount: 3,
+    movement: { pathKind: 'shadow', baseSpeed: 100, turnEveryMs: 1800, pauseChance: 0.1, vanishChance: 0.02 },
+    sound: { frequency: 180, type: 'sine' },
+  },
+]);
+
+export function getModeById(id) {
+  return MODE_CATALOG.find((mode) => mode.id === Number(id)) || MODE_CATALOG[0];
+}
+
+export function modesByStimulation(strategy) {
+  if (strategy === 'calmOnly') return MODE_CATALOG.filter((mode) => mode.stimulation === STIMULATION.LOW);
+  if (strategy === 'highStimShort') return MODE_CATALOG.filter((mode) => mode.stimulation === STIMULATION.HIGH);
+  return MODE_CATALOG;
+}
