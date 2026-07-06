@@ -7,30 +7,45 @@ export class Hud {
       hits: documentRef.getElementById('hits'),
       combo: documentRef.getElementById('combo'),
       fps: documentRef.getElementById('fps'),
+      homePage: documentRef.getElementById('homePage'),
+      startOverlay: documentRef.getElementById('homePage'),
       settingsPanel: documentRef.getElementById('settingsPanel'),
-      startOverlay: documentRef.getElementById('startOverlay'),
+      pausePanel: documentRef.getElementById('pausePanel'),
+      summaryPage: documentRef.getElementById('summaryPage'),
+      historyPage: documentRef.getElementById('historyPage'),
       restPrompt: documentRef.getElementById('restPrompt'),
       speedLevel: documentRef.getElementById('speedLevel'),
-      targetSize: documentRef.getElementById('targetSize'),
-      stimulation: documentRef.getElementById('stimulation'),
       soundLevel: documentRef.getElementById('soundLevel'),
-      rotationStrategy: documentRef.getElementById('rotationStrategy'),
-      muted: documentRef.getElementById('muted'),
+      summaryTouches: documentRef.getElementById('summaryTouches'),
+      summaryBest: documentRef.getElementById('summaryBest'),
+      summaryDuration: documentRef.getElementById('summaryDuration'),
+      historyList: documentRef.getElementById('historyList'),
     };
   }
 
-  bindHandlers({ onStart, onNextMode, onOpenSettings, onCloseSettings, onSaveSettings, onResetSettings, onDismissRest }) {
-    this.document.getElementById('startButton')?.addEventListener('click', onStart);
-    this.document.getElementById('nextModeButton')?.addEventListener('click', onNextMode);
-    this.document.getElementById('settingsButton')?.addEventListener('click', onOpenSettings);
-    this.document.getElementById('closeSettingsButton')?.addEventListener('click', onCloseSettings);
-    this.document.getElementById('saveSettingsButton')?.addEventListener('click', onSaveSettings);
-    this.document.getElementById('resetButton')?.addEventListener('click', onResetSettings);
-    this.document.getElementById('dismissRestButton')?.addEventListener('click', onDismissRest);
+  bindHandlers(handlers) {
+    const bind = (id, fn) => {
+      if (typeof fn === 'function') this.document.getElementById(id)?.addEventListener('click', fn);
+    };
+    bind('startButton', handlers.onStart);
+    bind('nextModeButton', handlers.onNextMode);
+    bind('settingsButton', handlers.onOpenSettings);
+    bind('pauseButton', handlers.onPause);
+    bind('resumeButton', handlers.onResume);
+    bind('backHomeButton', handlers.onBackHome);
+    bind('closeSettingsButton', handlers.onCloseSettings);
+    bind('saveSettingsButton', handlers.onSaveSettings);
+    bind('historyButton', handlers.onOpenHistory);
+    bind('closeHistoryButton', handlers.onCloseHistory);
+    bind('historyHomeButton', handlers.onGoHome || handlers.onBackHome);
+    bind('playAgainButton', handlers.onPlayAgain);
+    bind('summaryHomeButton', handlers.onSummaryHome || handlers.onBackHome);
+    bind('dismissRestButton', handlers.onDismissRest);
+    bind('loginMockButton', handlers.onLoginMock);
   }
 
   updateStats({ mode, score, hits, combo, fps }) {
-    if (this.elements.modeName && mode) this.elements.modeName.textContent = mode.name;
+    if (this.elements.modeName && mode) this.elements.modeName.textContent = mode.name || '小猫逗乐专用';
     if (this.elements.score) this.elements.score.textContent = String(score ?? 0);
     if (this.elements.hits) this.elements.hits.textContent = String(hits ?? 0);
     if (this.elements.combo) this.elements.combo.textContent = String(combo ?? 0);
@@ -38,35 +53,60 @@ export class Hud {
   }
 
   setSettings(settings) {
-    for (const key of ['speedLevel', 'targetSize', 'stimulation', 'soundLevel', 'rotationStrategy']) {
-      if (this.elements[key]) this.elements[key].value = String(settings[key]);
-    }
-    if (this.elements.muted) this.elements.muted.checked = Boolean(settings.muted);
+    if (this.elements.speedLevel) this.elements.speedLevel.value = String(settings.speedLevel);
+    if (this.elements.soundLevel) this.elements.soundLevel.value = String(settings.soundLevel);
   }
 
   readSettings(current) {
     return {
       ...current,
       speedLevel: Number(this.elements.speedLevel?.value || current.speedLevel),
-      targetSize: this.elements.targetSize?.value || current.targetSize,
-      stimulation: this.elements.stimulation?.value || current.stimulation,
       soundLevel: this.elements.soundLevel?.value || current.soundLevel,
-      rotationStrategy: this.elements.rotationStrategy?.value || current.rotationStrategy,
-      muted: Boolean(this.elements.muted?.checked),
     };
   }
 
-  showSettings(visible) {
-    this.elements.settingsPanel?.classList.toggle('visible', visible);
-    this.elements.settingsPanel?.setAttribute('aria-hidden', visible ? 'false' : 'true');
+  showHome(visible) { this.toggle(this.elements.homePage, visible); }
+  showStart(visible) { this.showHome(visible); }
+  showSettings(visible) { this.toggle(this.elements.settingsPanel, visible); }
+  showPause(visible) { this.toggle(this.elements.pausePanel, visible); }
+  showSummary(visible) { this.toggle(this.elements.summaryPage, visible); }
+  showHistory(visible) { this.toggle(this.elements.historyPage, visible); }
+  showRestPrompt(visible) { this.toggle(this.elements.restPrompt, visible); }
+
+  hideAllPanels() {
+    this.showSettings(false);
+    this.showPause(false);
+    this.showSummary(false);
+    this.showHistory(false);
+    this.showRestPrompt(false);
   }
 
-  showStart(visible) {
-    this.elements.startOverlay?.classList.toggle('visible', visible);
+  toggle(element, visible) {
+    element?.classList.toggle('visible', Boolean(visible));
+    element?.setAttribute('aria-hidden', visible ? 'false' : 'true');
   }
 
-  showRestPrompt(visible) {
-    this.elements.restPrompt?.classList.toggle('visible', visible);
-    this.elements.restPrompt?.setAttribute('aria-hidden', visible ? 'false' : 'true');
+  updateSummary(stats) {
+    if (this.elements.summaryTouches) this.elements.summaryTouches.textContent = String(stats?.touches ?? 0);
+    if (this.elements.summaryBest) this.elements.summaryBest.textContent = String(stats?.bestTouches ?? 0);
+    if (this.elements.summaryDuration) this.elements.summaryDuration.textContent = formatDuration(stats?.totalDurationMs ?? 0);
   }
+
+  renderHistory(history = []) {
+    if (!this.elements.historyList) return;
+    if (!history.length) {
+      this.elements.historyList.innerHTML = '<div class="history-empty">还没有玩耍记录，开启逗猫后会自动保存。</div>';
+      return;
+    }
+    this.elements.historyList.innerHTML = history.slice(0, 12).map((session, index) => {
+      const endedAt = session.endedAt ? new Date(session.endedAt).toLocaleString('zh-CN', { hour12: false }) : `第 ${index + 1} 次`;
+      return `<article class="history-item"><div><strong>${endedAt}</strong><span class="history-meta">触碰 ${session.touches || 0} 次 · 分数 ${session.score || 0}</span></div><b>${formatDuration(session.durationMs || 0)}</b></article>`;
+    }).join('');
+  }
+}
+
+export function formatDuration(ms) {
+  const minutes = Math.max(0, Math.round(Number(ms || 0) / 60000));
+  if (minutes < 1) return '少于 1 分钟';
+  return `${minutes} 分钟`;
 }

@@ -2,6 +2,8 @@ export class AudioManager {
   constructor() {
     this.context = null;
     this.enabled = false;
+    this.settings = null;
+    this.ambientNodes = null;
   }
 
   async unlock() {
@@ -14,35 +16,72 @@ export class AudioManager {
 
   configure(settings) {
     this.settings = settings;
+    if (this.ambientNodes) {
+      this.stopAmbient();
+      this.startAmbient();
+    }
+  }
+
+  volume() {
+    if (!this.settings || this.settings.muted || this.settings.soundLevel === 'off') return 0;
+    const gainByLevel = { soft: 0.018, standard: 0.032, active: 0.032 };
+    return gainByLevel[this.settings.soundLevel] ?? 0.018;
+  }
+
+  startAmbient() {
+    if (!this.context || !this.enabled || this.ambientNodes || this.volume() <= 0) return;
+    const rustle = this.context.createOscillator();
+    const bell = this.context.createOscillator();
+    const gain = this.context.createGain();
+    rustle.type = 'triangle';
+    rustle.frequency.value = 118;
+    bell.type = 'sine';
+    bell.frequency.value = 620;
+    gain.gain.value = this.volume() * 0.28;
+    rustle.connect(gain);
+    bell.connect(gain);
+    gain.connect(this.context.destination);
+    rustle.start();
+    bell.start();
+    this.ambientNodes = { rustle, bell, gain };
+  }
+
+  stopAmbient() {
+    if (!this.ambientNodes) return;
+    const stopAt = this.context?.currentTime ? this.context.currentTime + 0.04 : undefined;
+    try {
+      this.ambientNodes.gain.gain.exponentialRampToValueAtTime(0.0001, stopAt);
+      this.ambientNodes.rustle.stop(stopAt);
+      this.ambientNodes.bell.stop(stopAt);
+    } catch {}
+    this.ambientNodes = null;
   }
 
   playHitCue(mode) {
-    if (!this.context || !this.enabled || !this.settings || this.settings.muted || this.settings.soundLevel === 'off') return;
-    const gainByLevel = { soft: 0.035, standard: 0.06, active: 0.09 };
-    const gainValue = gainByLevel[this.settings.soundLevel] ?? 0.035;
-    const oscillator = this.context.createOscillator();
-    const gain = this.context.createGain();
-    oscillator.type = mode.sound?.type || 'sine';
-    oscillator.frequency.value = mode.sound?.frequency || 440;
-    gain.gain.setValueAtTime(0.0001, this.context.currentTime);
-    gain.gain.exponentialRampToValueAtTime(gainValue, this.context.currentTime + 0.01);
-    gain.gain.exponentialRampToValueAtTime(0.0001, this.context.currentTime + 0.14);
-    oscillator.connect(gain);
-    gain.connect(this.context.destination);
-    oscillator.start();
-    oscillator.stop(this.context.currentTime + 0.16);
+    const baseGain = this.volume();
+    if (!this.context || !this.enabled || baseGain <= 0) return;
+    this.playTone(mode?.sound?.frequency || 420, 0.11, baseGain * 1.9, mode?.sound?.type || 'sine');
+    this.playTone((mode?.sound?.frequency || 420) * 1.52, 0.16, baseGain * 0.75, 'sine', 0.03);
   }
 
   playModeCue(mode) {
-    if (!this.context || !this.enabled || this.settings?.muted || this.settings?.soundLevel === 'off') return;
+    const baseGain = this.volume();
+    if (!this.context || !this.enabled || baseGain <= 0) return;
+    this.playTone(Math.max(160, (mode?.sound?.frequency || 320) * 0.72), 0.24, baseGain * 0.85, 'triangle');
+  }
+
+  playTone(frequency, duration, gainValue, type = 'sine', delay = 0) {
     const oscillator = this.context.createOscillator();
     const gain = this.context.createGain();
-    oscillator.type = 'sine';
-    oscillator.frequency.value = Math.max(120, (mode.sound?.frequency || 320) * 0.5);
-    gain.gain.value = 0.02;
+    const startAt = this.context.currentTime + delay;
+    oscillator.type = type;
+    oscillator.frequency.value = frequency;
+    gain.gain.setValueAtTime(0.0001, startAt);
+    gain.gain.exponentialRampToValueAtTime(Math.max(0.0002, gainValue), startAt + 0.018);
+    gain.gain.exponentialRampToValueAtTime(0.0001, startAt + duration);
     oscillator.connect(gain);
     gain.connect(this.context.destination);
-    oscillator.start();
-    oscillator.stop(this.context.currentTime + 0.28);
+    oscillator.start(startAt);
+    oscillator.stop(startAt + duration + 0.02);
   }
 }

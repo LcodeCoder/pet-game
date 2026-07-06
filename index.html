@@ -3,99 +3,127 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
-    <meta name="theme-color" content="#07121c" />
-    <title>&#32466;&#32466;&#20048;&#22253;</title>
+    <meta name="theme-color" content="#FFF9E6" />
+    <title>绒绒乐园｜小猫逗乐专用</title>
     <link rel="stylesheet" href="./src/styles.css" />
   </head>
   <body>
     <main id="app" class="game-shell">
-      <canvas id="gameCanvas" aria-label="Rongrong Paradise game canvas"></canvas>
+      <canvas id="gameCanvas" aria-label="绒绒乐园逗猫游戏画布"></canvas>
 
       <section id="hud" class="hud" aria-live="polite">
-        <div class="brand">
-          <span class="brand-mark" aria-hidden="true">&#128062;</span>
+        <div class="brand" aria-label="绒绒乐园标题">
+          <span class="brand-mark" aria-hidden="true">🐾</span>
           <div>
-            <strong>&#32466;&#32466;&#20048;&#22253;</strong>
-            <span id="modeName">Loading...</span>
+            <strong>绒绒乐园</strong>
+            <span id="modeName">小猫逗乐专用</span>
           </div>
         </div>
-        <div class="stats">
-          <span>Score <b id="score">0</b></span>
-          <span>Hits <b id="hits">0</b></span>
-          <span>Combo <b id="combo">0</b></span>
-          <span>FPS <b id="fps">--</b></span>
+
+        <div class="top-actions" aria-label="游戏操作">
+          <button id="nextModeButton" type="button" class="soft-button compact">下一关</button>
+          <button id="settingsButton" type="button" class="soft-button compact">设置</button>
+          <button id="pauseButton" type="button" class="paw-chip" aria-label="暂停玩耍">🐾</button>
+          <button id="loginMockButton" type="button" class="paw-login" aria-label="抖音登录占位">抖音</button>
         </div>
-        <div class="actions">
-          <button id="nextModeButton" type="button">Next</button>
-          <button id="settingsButton" type="button">Settings</button>
+
+        <div class="stats" aria-label="本轮数据">
+          <span>分数 <b id="score">0</b></span>
+          <span>触碰次数 <b id="hits">0</b></span>
+          <span>连击 <b id="combo">0</b></span>
+          <span>帧率 <b id="fps">--</b></span>
         </div>
       </section>
 
-      <section id="startOverlay" class="overlay visible">
-        <div class="card hero-card">
-          <p class="eyebrow">Cat-first mini game</p>
-          <h1>&#32466;&#32466;&#20048;&#22253;</h1>
-          <p>High-contrast moving targets, soft feedback sounds, and anti-repeat mode rotation for curious cats.</p>
-          <button id="startButton" type="button" class="primary">Start Playing</button>
-          <p class="hint">Tip: use a landscape phone/tablet. Touch or click the moving target.</p>
+      <section id="homePage" class="page-overlay visible" aria-label="待机首页">
+        <div class="home-card">
+          <div class="cat-illustration" aria-hidden="true">
+            <span class="cat-ear left"></span>
+            <span class="cat-ear right"></span>
+            <div class="cat-face">
+              <span class="cat-eye left"></span>
+              <span class="cat-eye right"></span>
+              <span class="cat-nose"></span>
+              <span class="cat-mouth"></span>
+            </div>
+            <span class="cat-paw left">🐾</span>
+            <span class="cat-paw right">🐾</span>
+          </div>
+          <h1>绒绒乐园</h1>
+          <p>软萌、慢速、专为真实小猫爪子触控玩耍。</p>
+          <button id="startButton" type="button" class="soft-button hero-button">开启逗猫</button>
         </div>
       </section>
 
-      <section id="settingsPanel" class="panel" aria-hidden="true">
-        <div class="panel-header">
-          <h2>Settings</h2>
-          <button id="closeSettingsButton" type="button" aria-label="Close settings">&times;</button>
+      <section id="pausePanel" class="modal-overlay" aria-hidden="true" aria-label="暂停弹窗">
+        <div class="modal-card nap-card">
+          <div class="nap-cat" aria-hidden="true">😽💤</div>
+          <h2>小猫打个盹</h2>
+          <p>玩具已经静止，随时继续玩耍。</p>
+          <div class="modal-actions two">
+            <button id="resumeButton" type="button" class="soft-button">继续玩耍</button>
+            <button id="backHomeButton" type="button" class="soft-button secondary">返回乐园</button>
+          </div>
         </div>
-        <label>Speed
-          <select id="speedLevel">
-            <option value="1">Slow</option>
-            <option value="2">Medium</option>
-            <option value="3">Fast</option>
-          </select>
-        </label>
-        <label>Target size
-          <select id="targetSize">
-            <option value="small">Small</option>
-            <option value="medium">Medium</option>
-            <option value="large">Large</option>
-          </select>
-        </label>
-        <label>Stimulation
-          <select id="stimulation">
-            <option value="calm">Calm</option>
-            <option value="standard">Standard</option>
-            <option value="active">Active</option>
-          </select>
-        </label>
-        <label>Sound
-          <select id="soundLevel">
-            <option value="off">Off</option>
-            <option value="soft">Soft</option>
-            <option value="standard">Standard</option>
-            <option value="active">Active</option>
-          </select>
-        </label>
-        <label>Rotation
-          <select id="rotationStrategy">
-            <option value="auto">Auto recommendation</option>
-            <option value="calmOnly">Calm only</option>
-            <option value="highStimShort">High stimulation short rounds</option>
-            <option value="mixed">Mixed random</option>
-          </select>
-        </label>
-        <label class="check-row">
-          <input id="muted" type="checkbox" /> Muted
-        </label>
-        <div class="panel-actions">
-          <button id="resetButton" type="button">Reset</button>
-          <button id="saveSettingsButton" type="button" class="primary">Save</button>
+      </section>
+
+      <section id="settingsPanel" class="modal-overlay" aria-hidden="true" aria-label="设置页面">
+        <div class="modal-card settings-card">
+          <div class="panel-header">
+            <h2>设置</h2>
+            <button id="closeSettingsButton" type="button" class="round-close" aria-label="关闭设置">×</button>
+          </div>
+          <label class="setting-row">玩具移动快慢
+            <select id="speedLevel">
+              <option value="1">慢悠悠</option>
+              <option value="2">刚刚好</option>
+              <option value="3">稍微快</option>
+            </select>
+          </label>
+          <label class="setting-row">背景音效音量
+            <select id="soundLevel">
+              <option value="off">关闭</option>
+              <option value="soft">轻柔</option>
+              <option value="standard">温和</option>
+            </select>
+          </label>
+          <div class="panel-actions">
+            <button id="historyButton" type="button" class="soft-button secondary">玩耍记录</button>
+            <button id="saveSettingsButton" type="button" class="soft-button">保存</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="summaryPage" class="page-overlay" aria-hidden="true" aria-label="结算页面">
+        <div class="modal-card summary-card">
+          <h2>本次玩耍结束</h2>
+          <div class="summary-grid">
+            <article><span>本次触碰次数</span><b id="summaryTouches">0</b></article>
+            <article><span>历史最高记录</span><b id="summaryBest">0</b></article>
+            <article><span>累计游玩时长</span><b id="summaryDuration">0 分钟</b></article>
+          </div>
+          <div class="modal-actions two">
+            <button id="playAgainButton" type="button" class="soft-button">再玩一次</button>
+            <button id="summaryHomeButton" type="button" class="soft-button secondary">返回乐园</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="historyPage" class="page-overlay" aria-hidden="true" aria-label="玩耍历史记录页">
+        <div class="modal-card history-card">
+          <div class="panel-header">
+            <h2>玩耍记录</h2>
+            <button id="closeHistoryButton" type="button" class="round-close" aria-label="关闭记录">×</button>
+          </div>
+          <div id="historyList" class="history-list"></div>
+          <button id="historyHomeButton" type="button" class="soft-button secondary">返回乐园</button>
         </div>
       </section>
 
       <section id="restPrompt" class="rest-prompt" aria-hidden="true">
-        <strong>Rest suggestion</strong>
-        <span>Switching toward calmer motion. Give your cat a short break if they look tired.</span>
-        <button id="dismissRestButton" type="button">OK</button>
+        <strong>休息提醒</strong>
+        <span>已切换为更慢更柔和的玩具，若小猫困了可以暂停。</span>
+        <button id="dismissRestButton" type="button">知道啦</button>
       </section>
     </main>
     <script type="module" src="./src/main.js"></script>
